@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "lazy-sticky-headers"
 include(":sticky-headers")
+include(":demo:composeApp")
