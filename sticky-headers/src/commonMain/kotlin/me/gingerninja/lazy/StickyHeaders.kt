@@ -42,6 +42,17 @@ private data class StickyInterval<T : Any>(
     - scroll on the box? overscroll effect?
  */
 
+/**
+ * Creates and tracks sticky items belonging to the list with [state].
+ *
+ * When the [stickyKeyFactory] returns `null`, it acts as a boundary for the sticky items before /
+ * after.
+ *
+ * @param state the [LazyListState] of the list
+ * @param stickyKeyFactory key factory function for the sticky items
+ * @param modifier [Modifier] applied to the container of the sticky items
+ * @param content sticky item content
+ */
 //@NonRestartableComposable
 @Composable
 fun <T : Any> StickyHeaders(
@@ -60,6 +71,17 @@ fun <T : Any> StickyHeaders(
     )
 }
 
+/**
+ * Creates and tracks sticky items belonging to the list with [state].
+ *
+ * When the [stickyKeyFactory] returns `null`, it acts as a boundary for the sticky items before /
+ * after.
+ *
+ * @param state the [LazyListState] of the list
+ * @param stickyKeyFactory key factory function for the sticky items
+ * @param modifier [Modifier] applied to the container of the sticky items
+ * @param content sticky item content
+ */
 //@NonRestartableComposable
 @Composable
 fun <T : Any> StickyHeaders(
@@ -78,6 +100,22 @@ fun <T : Any> StickyHeaders(
     )
 }
 
+/**
+ * Creates and tracks sticky items belonging to a
+ * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or a
+ * [LazyRow][androidx.compose.foundation.lazy.LazyRow] with [state].
+ *
+ * The items are grouped by the value returned by [stickyKeyFactory]. This grouping only occurs in
+ * a consecutive order, meaning that if the function returns the same value for two non-consecutive
+ * items, two sticky headers will be created, thus this is generally discouraged.
+ * When the [stickyKeyFactory] returns `null`, it acts as a boundary for the sticky items before /
+ * after.
+ *
+ * @param state the [LazyListState] of the list
+ * @param stickyKeyFactory key factory function for the sticky items
+ * @param modifier [Modifier] applied to the container of the sticky items
+ * @param content sticky item content
+ */
 @Composable
 fun <T : Any> StickyHeaders(
     state: LazyListState,

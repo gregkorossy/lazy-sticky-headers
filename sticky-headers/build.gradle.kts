@@ -1,3 +1,4 @@
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
@@ -7,6 +8,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.jetbrainsCompose)
     id("module.publication")
+    alias(libs.plugins.dokka)
 }
 
 version = "0.1.0-SNAPSHOT"
@@ -115,6 +117,10 @@ tasks.withType<JavaCompile>().configureEach {
     this.sourceCompatibility = libs.versions.jvmTarget.get()
 }
 
+tasks.withType<DokkaTask>().configureEach {
+    notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/2231")
+}
+
 /*kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
@@ -128,8 +134,9 @@ composeCompiler {
 /* ℹ️ Interesting commands:
 
 - publish to local maven: ./gradlew publishToMavenLocal
-- API dump: ./gradlew apiDump
-- API check: ./gradlew apiCheck
-- check project: ./gradlew check
+- API dump: ./gradlew :sticky-headers:apiDump
+- API check: ./gradlew :sticky-headers:apiCheck
+- check project: ./gradlew :sticky-headers:check
+- Dokka: ./gradlew sticky-headers:dokkaHtml --no-configuration-cache
 
  */

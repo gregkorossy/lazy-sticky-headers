@@ -70,6 +70,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.kotlinx.datetime)
             implementation(project(":sticky-headers"))
+            implementation(libs.androidx.navigation)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
