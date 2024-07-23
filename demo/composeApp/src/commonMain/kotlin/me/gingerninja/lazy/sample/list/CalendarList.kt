@@ -49,8 +49,8 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import me.gingerninja.lazy.StickyHeaders
-import me.gingerninja.lazy.sample.Destination
 import me.gingerninja.lazy.sample.DemoSettings
+import me.gingerninja.lazy.sample.Destination
 import kotlin.math.absoluteValue
 
 internal fun NavGraphBuilder.calendarList(
@@ -202,9 +202,9 @@ private fun ScheduleView(
                 .padding(start = 20.dp)
                 .fillMaxHeight(),
             state = listState,
-            stickyKeyFactory = { index, _, type ->
-                val itemKey = getDataByIndex(index)//key as CalculatedDate
-                val itemType = type as ScheduleItemType
+            stickyKeyFactory = { item ->
+                val itemKey = getDataByIndex(item.index)
+                val itemType = item.contentType as ScheduleItemType
 
                 if (itemType != ScheduleItemType.ITEM) {
                     null
@@ -267,7 +267,7 @@ private fun ScheduleView(
 }
 
 @Composable
-fun ScheduleWeek(
+private fun ScheduleWeek(
     startDate: LocalDate,
     today: LocalDate,
     modifier: Modifier = Modifier,

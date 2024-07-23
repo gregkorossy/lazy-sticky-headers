@@ -44,8 +44,8 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import me.gingerninja.lazy.StickyHeaders
-import me.gingerninja.lazy.sample.Destination
 import me.gingerninja.lazy.sample.DemoSettings
+import me.gingerninja.lazy.sample.Destination
 
 internal fun NavGraphBuilder.sampleList(
     onBack: () -> Unit,
@@ -153,8 +153,8 @@ private fun SampleList(
                     .padding(start = 20.dp)
                     .fillMaxHeight(),
                 state = listState,
-                stickyKeyFactory = { index ->
-                    val date = startDate.plus(index, DateTimeUnit.DAY)
+                stickyKeyFactory = { item ->
+                    val date = startDate.plus(item.index, DateTimeUnit.DAY)
 
                     if (date.dayOfMonth % 3 == 0) {
                         null
@@ -203,8 +203,8 @@ private fun SampleList(
                 modifier = Modifier
                     .fillMaxWidth(),
                 state = listState,
-                stickyKeyFactory = { index ->
-                    val date = startDate.plus(index, DateTimeUnit.DAY)
+                stickyKeyFactory = { item ->
+                    val date = startDate.plus(item.index, DateTimeUnit.DAY)
 
                     LocalDate(date.year, date.month, 1)
                 }
@@ -279,8 +279,6 @@ private fun LazyListScope.verticalListItems(
                 Text("Full-size item at $date")
             }
         }
-
-
     }
 }
 

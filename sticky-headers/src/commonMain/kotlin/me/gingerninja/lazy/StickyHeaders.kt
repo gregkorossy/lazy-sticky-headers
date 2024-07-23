@@ -17,6 +17,7 @@ package me.gingerninja.lazy
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -35,70 +36,11 @@ private data class StickyInterval<T : Any>(
     val key: T,
     val startIndex: Int,
     val endIndex: Int,
-    val nextKey: T?
 )
 
 /* TODO
     - scroll on the box? overscroll effect?
  */
-
-/**
- * Creates and tracks sticky items belonging to the list with [state].
- *
- * When the [stickyKeyFactory] returns `null`, it acts as a boundary for the sticky items before /
- * after.
- *
- * @param state the [LazyListState] of the list
- * @param stickyKeyFactory key factory function for the sticky items
- * @param modifier [Modifier] applied to the container of the sticky items
- * @param content sticky item content
- */
-//@NonRestartableComposable
-@Composable
-fun <T : Any> StickyHeaders(
-    state: LazyListState,
-    stickyKeyFactory: (index: Int) -> T?,
-    modifier: Modifier = Modifier,
-    content: @Composable (key: T) -> Unit
-) {
-    StickyHeaders(
-        state = state,
-        stickyKeyFactory = { index, _, _ ->
-            stickyKeyFactory(index)
-        },
-        modifier = modifier,
-        content = content
-    )
-}
-
-/**
- * Creates and tracks sticky items belonging to the list with [state].
- *
- * When the [stickyKeyFactory] returns `null`, it acts as a boundary for the sticky items before /
- * after.
- *
- * @param state the [LazyListState] of the list
- * @param stickyKeyFactory key factory function for the sticky items
- * @param modifier [Modifier] applied to the container of the sticky items
- * @param content sticky item content
- */
-//@NonRestartableComposable
-@Composable
-fun <T : Any> StickyHeaders(
-    state: LazyListState,
-    stickyKeyFactory: (index: Int, key: Any) -> T?,
-    modifier: Modifier = Modifier,
-    content: @Composable (key: T) -> Unit
-) {
-    StickyHeaders(
-        state = state,
-        stickyKeyFactory = { index, key, _ ->
-            stickyKeyFactory(index, key)
-        },
-        modifier = modifier,
-        content = content
-    )
-}
 
 /**
  * Creates and tracks sticky items belonging to a
@@ -119,9 +61,9 @@ fun <T : Any> StickyHeaders(
 @Composable
 fun <T : Any> StickyHeaders(
     state: LazyListState,
-    stickyKeyFactory: (index: Int, key: Any, contentType: Any?) -> T?,
+    stickyKeyFactory: (item: LazyListItemInfo) -> T?,
     modifier: Modifier = Modifier,
-    content: @Composable (key: T) -> Unit
+    content: @Composable (stickyKey: T) -> Unit
 ) {
     val keyFactory = rememberUpdatedState(stickyKeyFactory)
 
@@ -148,7 +90,7 @@ fun <T : Any> StickyHeaders(
 
                     buildList {
                         items.forEach { item ->
-                            val key = keyFactory.value(item.index, item.key, item.contentType)
+                            val key = keyFactory.value(item)
 
                             if (!initKeySet) {
                                 initKeySet = true
@@ -158,7 +100,7 @@ fun <T : Any> StickyHeaders(
                             if (lastKey != key) {
                                 lastKey?.also {
                                     add(
-                                        StickyInterval(it, lastIndex, item.index, key)
+                                        StickyInterval(it, lastIndex, item.index)
                                     )
                                 }
 
@@ -169,7 +111,7 @@ fun <T : Any> StickyHeaders(
 
                         lastKey?.also {
                             add(
-                                StickyInterval(it, lastIndex, items.last().index, null)
+                                StickyInterval(it, lastIndex, items.last().index)
                             )
                         }
                     }
