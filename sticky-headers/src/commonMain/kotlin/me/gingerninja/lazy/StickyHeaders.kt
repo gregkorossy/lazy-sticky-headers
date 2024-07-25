@@ -111,7 +111,7 @@ fun <T : Any> StickyHeaders(
 
                         lastKey?.also {
                             add(
-                                StickyInterval(it, lastIndex, items.last().index)
+                                StickyInterval(it, lastIndex, items.last().index + 1)
                             )
                         }
                     }

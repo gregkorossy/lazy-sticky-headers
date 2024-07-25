@@ -35,7 +35,7 @@ kotlin {
     wasmJs {
         //nodejs()
         browser()
-        binaries.executable()
+        binaries.library()
     }
     // Building and publishing for iOS target requires a machine running macOS;
     // otherwise, the .klib will not be produced and the compiler warns about that.
