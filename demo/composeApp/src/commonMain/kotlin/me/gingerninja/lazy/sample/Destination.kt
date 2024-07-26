@@ -1,31 +1,24 @@
+/*
+ * Copyright 2024 Gergely Kőrössy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package me.gingerninja.lazy.sample
-
-/*@Composable
-fun rememberAppNavController(): AppNavController {
-    return remember {
-        AppNavController()
-    }
-}
-
-class AppNavController {
-    var currentScreen by mutableStateOf<DestinationId?>(null)
-        private set
-
-    val canGoBack by derivedStateOf { currentScreen != null }
-
-    fun navigate(destination: DestinationId) {
-        currentScreen = destination
-    }
-
-    fun back() {
-        currentScreen = null
-    }
-}*/
 
 sealed class Destination(
     val route: String,
     val title: String,
-    val description: String? = null
+    val description: String? = null,
 ) {
     data object Home : Destination(
         route = "home",
@@ -35,31 +28,24 @@ sealed class Destination(
     data object ListVertical : Destination(
         route = "list/vertical",
         title = "LazyColumn",
-        description = "Items are placed in a LazyColumn"
+        description = "Items are placed in a LazyColumn",
     )
 
     data object ListHorizontal : Destination(
         route = "list/horizontal",
         title = "LazyRow",
-        description = "Items are placed in a LazyRow"
+        description = "Items are placed in a LazyRow",
     )
 
     data object ListCalendar : Destination(
         route = "list/calendar",
         title = "Calendar",
-        description = "Sample calendar schedule view"
+        description = "Sample calendar schedule view",
     )
 }
 
-/*enum class Destination(val route: String) {
-    HOME("home"),
-    LIST_VERTICAL("list/vertical"),
-    LIST_HORIZONTAL("list/horizontal"),
-    LIST_CALENDAR("list/calendar")
-}*/
-
-val destinations = listOf(
+val topDestinations = listOf(
     Destination.ListVertical,
     Destination.ListHorizontal,
-    Destination.ListCalendar
+    Destination.ListCalendar,
 )

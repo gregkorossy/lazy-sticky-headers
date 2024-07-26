@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 Gergely Kőrössy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package me.gingerninja.lazy.sample.list
 
 import androidx.compose.foundation.background
@@ -9,11 +24,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -35,11 +52,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
@@ -47,10 +66,7 @@ import me.gingerninja.lazy.StickyHeaders
 import me.gingerninja.lazy.sample.DemoSettings
 import me.gingerninja.lazy.sample.Destination
 
-internal fun NavGraphBuilder.sampleList(
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun NavGraphBuilder.sampleList(onBack: () -> Unit, modifier: Modifier = Modifier) {
     composable(Destination.ListVertical.route) {
         SampleListScreen(
             onBack = onBack,
@@ -76,7 +92,7 @@ private fun SampleListScreen(
     onBack: () -> Unit,
     settings: DemoSettings,
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
@@ -89,11 +105,11 @@ private fun SampleListScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onBack
+                        onClick = onBack,
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
                         )
                     }
                 },
@@ -111,22 +127,19 @@ private fun SampleListScreen(
                     }
                 }*/
             )
-        }
+        },
     ) {
         SampleList(
             settings = settings,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(it),
         )
     }
 }
 
 @Composable
-private fun SampleList(
-    settings: DemoSettings,
-    modifier: Modifier = Modifier
-) {
+private fun SampleList(settings: DemoSettings, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
 
     val startDate = remember {
@@ -139,11 +152,15 @@ private fun SampleList(
         today.minus(today.dayOfMonth - 1, DateTimeUnit.DAY)
     }
 
+    val formatter = LocalDate.Format {
+        monthName(MonthNames.ENGLISH_ABBREVIATED)
+    }
+
     if (settings.isVertical) {
         Box(modifier = modifier) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = listState
+                state = listState,
             ) {
                 verticalListItems(startDate, settings)
             }
@@ -154,18 +171,19 @@ private fun SampleList(
                     .fillMaxHeight(),
                 state = listState,
                 stickyKeyFactory = { item ->
-                    val date = startDate.plus(item.index, DateTimeUnit.DAY)
-
-                    if (date.dayOfMonth % 3 == 0) {
-                        null
-                    } else {
-                        date
+                    val date = startDate.plus(item.index, DateTimeUnit.DAY).let {
+                        it.minus(
+                            value = it.dayOfWeek.isoDayNumber - DayOfWeek.MONDAY.isoDayNumber,
+                            unit = DateTimeUnit.DAY,
+                        )
                     }
-                }
+
+                    date
+                },
             ) {
                 Column(
                     modifier = Modifier
-                        //.fillMaxWidth()
+                        // .fillMaxWidth()
                         .width(50.dp)
                         .padding(vertical = 10.dp)
                         .clip(MaterialTheme.shapes.medium)
@@ -173,16 +191,33 @@ private fun SampleList(
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(horizontal = 10.dp, vertical = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    val formatter = LocalDate.Format {
-                        dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
-                    }
+                    val endOfWeek = it.plus(6, DateTimeUnit.DAY)
+
                     Text(
                         text = it.format(formatter),
                         style = MaterialTheme.typography.labelSmall,
                     )
                     Text("${it.dayOfMonth}")
+
+                    Box(
+                        Modifier
+                            .padding(vertical = 4.dp)
+                            .size(20.dp, 4.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                shape = CircleShape,
+                            ),
+                    )
+
+                    if (endOfWeek.month != it.month) {
+                        Text(
+                            text = endOfWeek.format(formatter),
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+                    Text("${endOfWeek.dayOfMonth}")
                 }
             }
 
@@ -197,7 +232,7 @@ private fun SampleList(
         }
     } else {
         Column(
-            modifier = modifier
+            modifier = modifier,
         ) {
             StickyHeaders(
                 modifier = Modifier
@@ -207,7 +242,7 @@ private fun SampleList(
                     val date = startDate.plus(item.index, DateTimeUnit.DAY)
 
                     LocalDate(date.year, date.month, 1)
-                }
+                },
             ) {
                 val formatter = LocalDate.Format {
                     monthName(MonthNames.ENGLISH_FULL)
@@ -226,7 +261,7 @@ private fun SampleList(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                state = listState
+                state = listState,
             ) {
                 horizontalListItems(startDate, settings)
             }
@@ -234,13 +269,10 @@ private fun SampleList(
     }
 }
 
-private fun LazyListScope.verticalListItems(
-    startDate: LocalDate,
-    settings: DemoSettings
-) {
+private fun LazyListScope.verticalListItems(startDate: LocalDate, settings: DemoSettings) {
     items(
         count = if (settings.isInfinite) Int.MAX_VALUE else FINITE_ITEM_COUNT,
-        key = { it }
+        key = { it },
     ) {
         val date = startDate.plus(it, DateTimeUnit.DAY)
 
@@ -252,17 +284,17 @@ private fun LazyListScope.verticalListItems(
                         start = 20.dp,
                         end = 20.dp,
                         top = 10.dp,
-                        bottom = 10.dp
+                        bottom = 10.dp,
                     )
                     .padding(start = 70.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier.padding(20.dp),
                 ) {
                     Text(
                         "Day card",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
                         "$date",
@@ -274,7 +306,7 @@ private fun LazyListScope.verticalListItems(
                 Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.tertiaryContainer)
-                    .padding(40.dp)
+                    .padding(40.dp),
             ) {
                 Text("Full-size item at $date")
             }
@@ -282,13 +314,10 @@ private fun LazyListScope.verticalListItems(
     }
 }
 
-private fun LazyListScope.horizontalListItems(
-    startDate: LocalDate,
-    settings: DemoSettings
-) {
+private fun LazyListScope.horizontalListItems(startDate: LocalDate, settings: DemoSettings) {
     items(
         count = if (settings.isInfinite) Int.MAX_VALUE else FINITE_ITEM_COUNT,
-        key = { it }
+        key = { it },
     ) {
         val date = startDate.plus(it, DateTimeUnit.DAY)
 
@@ -301,12 +330,12 @@ private fun LazyListScope.horizontalListItems(
         }
 
         Column(
-            //modifier = Modifier.fillMaxWidth(),
+            // modifier = Modifier.fillMaxWidth(),
             modifier = Modifier
                 .width(50.dp),
-            //.padding(horizontal = 10.dp, vertical = 10.dp)
-            //.fillParentMaxWidth(1 / 7f),
-            horizontalAlignment = Alignment.CenterHorizontally
+            // .padding(horizontal = 10.dp, vertical = 10.dp)
+            // .fillParentMaxWidth(1 / 7f),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 modifier = Modifier.padding(bottom = 10.dp),

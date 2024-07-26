@@ -13,8 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import androidx.compose.ui.window.ComposeUIViewController
-import me.gingerninja.lazy.sample.App
+package me.gingerninja.lazy.sample
 
-@Suppress("FunctionName")
-fun MainViewController() = ComposeUIViewController { App() }
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+
+fun main() = application {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Lazy Sticky Headers demo",
+    ) {
+        App()
+    }
+}

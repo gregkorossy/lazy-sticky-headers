@@ -4,11 +4,15 @@ dokka = "1.9.20"
 kotlin = "2.0.0"
 compose-plugin = "1.6.11"
 binaryCompatibilityValidator = "0.15.0-Beta.3"
-nexus-publish = "2.0.0"
+nexusPlugin = "0.29.0"
+spotless = "6.25.0"
+nexus-publish = "2.0.0" # TODO remove
+
 android-minSdk = "21"
 android-compileSdk = "34"
 android-targetSdk = "34"
 jvmTarget = "11"
+
 # for the demo
 androidx-activity = "1.9.0"
 kotlinx-datetime = "0.6.0"
@@ -29,3 +33,5 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinBinaryCompatibilityValidator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+nexusPlugin = { id = "com.vanniktech.maven.publish", version.ref = "nexusPlugin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

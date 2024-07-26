@@ -121,7 +121,7 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "me.gingerninja.lazy.sample.MainKt"
 
         buildTypes.release.proguard {
             obfuscate = true

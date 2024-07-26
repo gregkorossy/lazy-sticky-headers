@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 Gergely Kőrössy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package me.gingerninja.lazy.sample.list
 
 import androidx.compose.foundation.background
@@ -53,10 +68,7 @@ import me.gingerninja.lazy.sample.DemoSettings
 import me.gingerninja.lazy.sample.Destination
 import kotlin.math.absoluteValue
 
-internal fun NavGraphBuilder.calendarList(
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+internal fun NavGraphBuilder.calendarList(onBack: () -> Unit, modifier: Modifier = Modifier) {
     composable(Destination.ListCalendar.route) {
         CalendarListScreen(
             onBack = onBack,
@@ -71,7 +83,7 @@ internal fun NavGraphBuilder.calendarList(
 private fun CalendarListScreen(
     onBack: () -> Unit,
     settings: DemoSettings,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier,
@@ -84,11 +96,11 @@ private fun CalendarListScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = onBack
+                        onClick = onBack,
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
                         )
                     }
                 },
@@ -106,44 +118,37 @@ private fun CalendarListScreen(
                     }
                 }*/
             )
-        }
+        },
     ) {
         CalendarList(
             settings = settings,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(it),
         )
     }
 }
 
 @Composable
-private fun CalendarList(
-    settings: DemoSettings,
-    modifier: Modifier = Modifier
-) {
+private fun CalendarList(settings: DemoSettings, modifier: Modifier = Modifier) {
     ScheduleView(
         modifier = modifier,
-        isInfinite = settings.isInfinite
+        isInfinite = settings.isInfinite,
     )
 }
 
 @Composable
-private fun ScheduleView(
-    modifier: Modifier,
-    isInfinite: Boolean
-) {
+private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
     val startIndex = remember(isInfinite) {
         if (isInfinite) Int.MAX_VALUE / 2 else 0
     }
 
     val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = startIndex
+        initialFirstVisibleItemIndex = startIndex,
     )
 
     val today = remember {
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-        //.plus(-2, DateTimeUnit.DAY)
     }
 
     val startDate = remember(isInfinite, today) {
@@ -163,12 +168,12 @@ private fun ScheduleView(
     Box(modifier = modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = listState
+            state = listState,
         ) {
             items(
                 count = if (isInfinite) Int.MAX_VALUE else FINITE_ITEM_COUNT,
-                key = { it },//::getDataByIndex,
-                contentType = ::getItemTypeByIndex
+                key = { it },
+                contentType = ::getItemTypeByIndex,
             ) {
                 val data = getDataByIndex(it)
 
@@ -182,15 +187,15 @@ private fun ScheduleView(
                                 start = 70.dp,
                                 end = 20.dp,
                                 top = 10.dp,
-                                bottom = 10.dp
-                            )
+                                bottom = 10.dp,
+                            ),
                         )
                     }
 
                     ScheduleItemType.ITEM -> {
                         ScheduleItemList(
                             date = data.date,
-                            modifier = Modifier.fillParentMaxWidth()
+                            modifier = Modifier.fillParentMaxWidth(),
                         )
                     }
                 }
@@ -211,17 +216,17 @@ private fun ScheduleView(
                 } else {
                     itemKey.date
                 }
-            }
+            },
         ) {
             Column(
                 modifier = Modifier
                     .width(50.dp)
-                    //.padding(vertical = 10.dp)
+                    // .padding(vertical = 10.dp)
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 10.dp, vertical = 0.dp)
                     .padding(bottom = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 val formatter = LocalDate.Format {
                     dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
@@ -233,7 +238,7 @@ private fun ScheduleView(
                         MaterialTheme.colorScheme.secondary
                     } else {
                         Color.Unspecified
-                    }
+                    },
                 )
                 Box(
                     modifier = Modifier
@@ -242,13 +247,13 @@ private fun ScheduleView(
                             if (today == it) {
                                 background(
                                     color = MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
+                                    shape = CircleShape,
                                 )
                             } else {
                                 this
                             }
                         },
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         modifier = Modifier.padding(bottom = 2.dp),
@@ -258,7 +263,7 @@ private fun ScheduleView(
                             MaterialTheme.colorScheme.onSecondary
                         } else {
                             MaterialTheme.colorScheme.onSurface
-                        }
+                        },
                     )
                 }
             }
@@ -267,25 +272,18 @@ private fun ScheduleView(
 }
 
 @Composable
-private fun ScheduleWeek(
-    startDate: LocalDate,
-    today: LocalDate,
-    modifier: Modifier = Modifier,
-) {
+private fun ScheduleWeek(startDate: LocalDate, today: LocalDate, modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
         text = formatWeekDate(startDate, today),
-        style = MaterialTheme.typography.labelMedium
+        style = MaterialTheme.typography.labelMedium,
     )
 }
 
 @Composable
-private fun ScheduleItemList(
-    date: LocalDate,
-    modifier: Modifier = Modifier,
-) {
+private fun ScheduleItemList(date: LocalDate, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         repeat(date.dayOfMonth % 3 + 1) {
             ScheduleItem(
@@ -296,34 +294,30 @@ private fun ScheduleItemList(
                         start = 70.dp,
                         end = 20.dp,
                         top = 2.dp,
-                        bottom = 8.dp
+                        bottom = 8.dp,
                     )
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             )
         }
 
         Spacer(
-            Modifier.height(20.dp)
+            Modifier.height(20.dp),
         )
     }
 }
 
 @Composable
-private fun ScheduleItem(
-    title: String,
-    subtitle: String,
-    modifier: Modifier = Modifier
-) {
+private fun ScheduleItem(title: String, subtitle: String, modifier: Modifier = Modifier) {
     Card(
         onClick = {},
         modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 6.dp, horizontal = 10.dp)
+            modifier = Modifier.padding(vertical = 6.dp, horizontal = 10.dp),
         ) {
             Text(
                 title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Text(subtitle)
         }
@@ -338,7 +332,7 @@ private class CalculatedDate(
 private fun calculateDataByIndex(
     index: Int,
     startIndex: Int,
-    startDate: LocalDate
+    startDate: LocalDate,
 ): CalculatedDate {
     val weekStartDiff = startDate.dayOfWeek.isoDayNumber - DayOfWeek.MONDAY.isoDayNumber
     val diff = index - startIndex
@@ -351,7 +345,7 @@ private fun calculateDataByIndex(
 
         CalculatedDate(
             date = date,
-            type = if (isWeek) ScheduleItemType.WEEK else ScheduleItemType.ITEM
+            type = if (isWeek) ScheduleItemType.WEEK else ScheduleItemType.ITEM,
         )
     } else {
         val weekItemCount = (diff + weekStartDiff + 1) / 8
@@ -361,7 +355,7 @@ private fun calculateDataByIndex(
 
         CalculatedDate(
             date = date,
-            type = if (isWeek) ScheduleItemType.WEEK else ScheduleItemType.ITEM
+            type = if (isWeek) ScheduleItemType.WEEK else ScheduleItemType.ITEM,
         )
     }
 }
@@ -416,5 +410,7 @@ private object DateFormatters {
 }
 
 private enum class ScheduleItemType {
-    MONTH, WEEK, ITEM
+    MONTH,
+    WEEK,
+    ITEM,
 }

@@ -63,7 +63,7 @@ fun <T : Any> StickyHeaders(
     state: LazyListState,
     stickyKeyFactory: (item: LazyListItemInfo) -> T?,
     modifier: Modifier = Modifier,
-    content: @Composable (stickyKey: T) -> Unit
+    content: @Composable (stickyKey: T) -> Unit,
 ) {
     val keyFactory = rememberUpdatedState(stickyKeyFactory)
 
@@ -100,7 +100,7 @@ fun <T : Any> StickyHeaders(
                             if (lastKey != key) {
                                 lastKey?.also {
                                     add(
-                                        StickyInterval(it, lastIndex, item.index)
+                                        StickyInterval(it, lastIndex, item.index),
                                     )
                                 }
 
@@ -111,7 +111,7 @@ fun <T : Any> StickyHeaders(
 
                         lastKey?.also {
                             add(
-                                StickyInterval(it, lastIndex, items.last().index + 1)
+                                StickyInterval(it, lastIndex, items.last().index + 1),
                             )
                         }
                     }
@@ -120,7 +120,7 @@ fun <T : Any> StickyHeaders(
     }
 
     Box(
-        modifier = modifier.clipToBounds()
+        modifier = modifier.clipToBounds(),
     ) {
         keys.forEach { (key, start, end) ->
             key(key) { // TODO ReusableContentHost { }, see LazyLayoutItemContentFactory
@@ -164,7 +164,7 @@ fun <T : Any> StickyHeaders(
                                     translationX = (offset + x) * direction
                                 }
                             }
-                        }
+                        },
                 ) {
                     content(key)
                 }

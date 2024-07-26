@@ -1,3 +1,18 @@
+/*
+ * Copyright 2024 Gergely Kőrössy
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package me.gingerninja.lazy.sample
 
 import androidx.compose.animation.fadeIn
@@ -40,12 +55,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App(
-    onSettingsUpdate: (DemoSettings) -> Unit = {}
-) {
+fun App(onSettingsUpdate: (DemoSettings) -> Unit = {}) {
     var settings by rememberSaveable(stateSaver = DemoSettings.Saver) {
         mutableStateOf(
-            DemoSettings()
+            DemoSettings(),
         )
     }
 
@@ -64,7 +77,7 @@ fun App(
     }
 
     LazySampleTheme(
-        darkTheme = darkTheme
+        darkTheme = darkTheme,
     ) {
         if (showSettings) {
             SettingsDialog(
@@ -74,7 +87,7 @@ fun App(
                 },
                 onDismiss = {
                     showSettings = false
-                }
+                },
             )
         }
 
@@ -82,19 +95,16 @@ fun App(
             settings = settings,
             showSettings = {
                 showSettings = true
-            }
+            },
         )
     }
 }
 
 @Composable
-private fun AppContent(
-    settings: DemoSettings,
-    showSettings: () -> Unit
-) {
+private fun AppContent(settings: DemoSettings, showSettings: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         AppNavHost(
             modifier = Modifier.fillMaxSize(),
@@ -108,7 +118,7 @@ private fun AppContent(
 private fun AppNavHost(
     settings: DemoSettings,
     showSettings: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
 
@@ -157,15 +167,15 @@ private fun SettingsDialog(
     settings: DemoSettings,
     onUpdate: (DemoSettings) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ModalBottomSheet(
         modifier = modifier,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     ) {
         var themeSelectorOpen by remember { mutableStateOf(false) }
         Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            modifier = Modifier.verticalScroll(rememberScrollState()),
         ) {
             ListItem(
                 modifier = Modifier.clickable {
@@ -175,14 +185,18 @@ private fun SettingsDialog(
                     Text("Theme")
                 },
                 supportingContent = {
-                    Box(modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.TopStart)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.TopStart),
+                    ) {
                         Text(settings.theme.text)
 
                         DropdownMenu(
                             expanded = themeSelectorOpen,
                             onDismissRequest = {
                                 themeSelectorOpen = false
-                            }
+                            },
                         ) {
                             Theme.entries.forEach {
                                 DropdownMenuItem(
@@ -192,7 +206,7 @@ private fun SettingsDialog(
                                     onClick = {
                                         onUpdate(settings.copy(theme = it))
                                         themeSelectorOpen = false
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -220,9 +234,9 @@ private fun SettingsDialog(
                         checked = settings.isVertical,
                         onCheckedChange = {
                             onUpdate(settings.copy(isVertical = !settings.isVertical))
-                        }
+                        },
                     )
-                }
+                },
             )
 
             ListItem(
@@ -246,9 +260,9 @@ private fun SettingsDialog(
                         checked = settings.isInfinite,
                         onCheckedChange = {
                             onUpdate(settings.copy(isInfinite = !settings.isInfinite))
-                        }
+                        },
                     )
-                }
+                },
             )
         }
     }
