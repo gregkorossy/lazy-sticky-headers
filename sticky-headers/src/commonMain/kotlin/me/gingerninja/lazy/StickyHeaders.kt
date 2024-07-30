@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 
 @Immutable
 private data class StickyInterval<T : Any>(
@@ -65,6 +67,8 @@ fun <T : Any> StickyHeaders(
     modifier: Modifier = Modifier,
     content: @Composable (stickyKey: T) -> Unit,
 ) {
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
     val keyFactory = rememberUpdatedState(stickyKeyFactory)
 
     val orientation by remember(state) {
@@ -145,7 +149,10 @@ fun <T : Any> StickyHeaders(
 
                             val beforePadding = state.layoutInfo.beforeContentPadding
 
-                            val direction = if (reverseLayout) -1f else 1f
+                            val switchDirection =
+                                reverseLayout.xor(isRtl && orientation == Orientation.Horizontal)
+
+                            val direction = if (switchDirection) -1f else 1f
 
                             if (item == null) { // don't show the item if it's not visible anymore
                                 alpha = 0f
