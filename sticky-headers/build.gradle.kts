@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.nexusPlugin)
 }
 
-version = "0.1.0-SNAPSHOT"
+version = "0.1.0-alpha01"
 
 kotlin {
     jvm(name = "desktop")

@@ -74,6 +74,10 @@ StickyHeaders(
 
 See the [demo](demo) app for more samples.
 
+## Known issues
+
+- missing overscroll effect: [#1](https://github.com/gregkorossy/lazy-sticky-headers/issues/1)
+
 ## License
 
 ```text
