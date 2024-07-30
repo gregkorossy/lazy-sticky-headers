@@ -28,8 +28,11 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
+    - name: Grant permission to execute Gradle
+      run: chmod +x gradlew
+
     - name: Release build
-      run: ./gradlew assemble
+      run: ./gradlew :sticky-headers:assemble
 
     - name: Publish to MavenCentral
       run: |
