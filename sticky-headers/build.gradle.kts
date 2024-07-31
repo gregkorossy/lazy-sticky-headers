@@ -123,34 +123,42 @@ tasks.withType<DokkaTask>().configureEach {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral(SonatypeHost.S01, automaticRelease = true)
 
     coordinates("me.gingerninja.lazy", "sticky-headers", version.toString())
 
     pom {
-        name.set("Lazy Sticky Headers")
-        description.set("Lazy Sticky Headers for Compose Multiplatform")
-        inceptionYear.set("2024")
-        url.set("https://github.com/gregkorossy/lazy-sticky-headers")
+        name = "Lazy Sticky Headers"
+        description = "Lazy Sticky Headers for Compose Multiplatform"
+        inceptionYear = "2024"
+        url = "https://github.com/gregkorossy/lazy-sticky-headers/"
 
         licenses {
             license {
-                name.set("Apache License, Version 2.0")
-                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                name = "The Apache Software License, Version 2.0"
+                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "repo"
             }
         }
         developers {
             developer {
-                id.set("gregkorossy")
-                name.set("Gergely Kőrössy")
-                url.set("https://github.com/gregkorossy/")
+                id = "gregkorossy"
+                name = "Gergely Kőrössy"
+                url = "https://github.com/gregkorossy/"
             }
         }
         scm {
-            url.set("https://github.com/gregkorossy/lazy-sticky-headers")
-            connection.set("scm:git:git://github.com/gregkorossy/lazy-sticky-headers.git")
-            developerConnection.set("scm:git:ssh://git@github.com/gregkorossy/lazy-sticky-headers.git")
+            url = "https://github.com/gregkorossy/lazy-sticky-headers/"
+            connection = "scm:git:git://github.com/gregkorossy/lazy-sticky-headers.git"
+            developerConnection = "scm:git:ssh://git@github.com/gregkorossy/lazy-sticky-headers.git"
+        }
+        issueManagement {
+            system = "GitHub"
+            url = "https://github.com/gregkorossy/lazy-sticky-headers/issues"
+        }
+        ciManagement {
+            system = "GitHub Actions"
+            url = "https://github.com/gregkorossy/lazy-sticky-headers/actions"
         }
     }
 
