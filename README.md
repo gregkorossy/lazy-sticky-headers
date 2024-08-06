@@ -1,3 +1,5 @@
+![Lazy Sticky Headers](asset/header.png)
+
 [![Kotlin 2.0.0](https://img.shields.io/badge/Kotlin-2.0.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Compose Multiplatform 1.6.11](https://img.shields.io/badge/Compose_Multiplatform-1.6.11-blue.svg?logo=jetpackcompose)](https://github.com/JetBrains/compose-multiplatform)
 [![Maven Central](https://img.shields.io/maven-central/v/me.gingerninja.lazy/sticky-headers?color=orange)](https://search.maven.org/search?q=g:me.gingerninja.lazy)
@@ -70,7 +72,7 @@ kotlin {
 ```kotlin
 StickyHeaders(
     state = listState, // from rememberLazyListState()
-    stickyKeyFactory = {
+    key = {
         // sample keys: every 2 items will be grouped
         it.index / 2
     }
@@ -79,7 +81,44 @@ StickyHeaders(
 }
 ```
 
-See the [demo](demo) app for more samples.
+
+The `StickyHeaders` is a container that holds the sticky items. This can be placed anywhere, such as in a `Box` overlaying the list items or in a `Row` / `Column` to align next to / over / under the list.
+
+> ⚠️ It is _important_ to set the list state on both the `StickyHeaders` and the `LazyColumn` / `LazyRow`.
+
+<details>
+
+<summary>Example: usage with a LazyColumn in a Row</summary>
+
+```kotlin
+val listState = rememberLazyListState()
+
+Row {
+    StickyHeaders(
+        state = listState,
+        key = {
+            it.index / 2
+        },
+    ) {
+        Text("Key: ${it.key}")
+    }
+
+    LazyColumn(
+        modifier = Modifier.weight(1f),
+        state = listState,
+    ) {
+        items(count = 100) {
+            Card {
+                Text("Item $it", modifier = Modifier.padding(20.dp))
+            }
+        }
+    }
+}
+```
+
+</details>
+
+See the [demo](demo) app for more elaborate samples.
 
 ## Known issues
 
