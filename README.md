@@ -23,7 +23,7 @@ Compose Multiplatform library for adding sticky headers to lazy lists.
 ## Getting started
 
 ```kotlin
-implementation("me.gingerninja.lazy:sticky-headers:0.1.0")
+implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
 ```
 
 <details>
@@ -36,7 +36,7 @@ If you target a subset of the library supported platforms, add the library to yo
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("me.gingerninja.lazy:sticky-headers:0.1.0")
+            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
             // ...
         }
     }
@@ -51,12 +51,12 @@ add the library separately to each supported target:
 kotlin {
     val desktopMain by getting {
         dependencies {
-            implementation("me.gingerninja.lazy:sticky-headers:0.1.0")
+            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
             // ...
         }
     }
     androidMain.dependencies {
-        implementation("me.gingerninja.lazy:sticky-headers:0.1.0")
+        implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
         // ...
     }
     // other targets...

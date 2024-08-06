@@ -123,7 +123,7 @@ tasks.withType<DokkaTask>().configureEach {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01, automaticRelease = true)
+    publishToMavenCentral(SonatypeHost.S01)
 
     coordinates("me.gingerninja.lazy", "sticky-headers", version.toString())
 
