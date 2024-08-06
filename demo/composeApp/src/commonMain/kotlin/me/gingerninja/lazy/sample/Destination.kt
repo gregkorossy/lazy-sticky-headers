@@ -15,37 +15,22 @@
  */
 package me.gingerninja.lazy.sample
 
-sealed class Destination(
+import me.gingerninja.lazy.sample.grid.GridDestinations
+import me.gingerninja.lazy.sample.list.ListDestinations
+
+data class Destination(
     val route: String,
     val title: String,
     val description: String? = null,
-) {
-    data object Home : Destination(
-        route = "home",
-        title = "Lazy Sticky Headers",
-    )
+    val enabled: Boolean = true,
+)
 
-    data object ListVertical : Destination(
-        route = "list/vertical",
-        title = "LazyColumn",
-        description = "Items are placed in a LazyColumn",
-    )
-
-    data object ListHorizontal : Destination(
-        route = "list/horizontal",
-        title = "LazyRow",
-        description = "Items are placed in a LazyRow",
-    )
-
-    data object ListCalendar : Destination(
-        route = "list/calendar",
-        title = "Calendar",
-        description = "Sample calendar schedule view",
-    )
-}
+val Home = Destination(
+    route = "home",
+    title = "Lazy Sticky Headers",
+)
 
 val topDestinations = listOf(
-    Destination.ListVertical,
-    Destination.ListHorizontal,
-    Destination.ListCalendar,
+    ListDestinations.root,
+    GridDestinations.root,
 )

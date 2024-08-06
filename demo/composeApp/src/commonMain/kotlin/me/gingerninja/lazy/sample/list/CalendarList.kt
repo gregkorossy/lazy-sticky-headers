@@ -28,6 +28,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -41,57 +44,47 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.isoDayNumber
-import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import me.gingerninja.lazy.StickyHeaders
-import me.gingerninja.lazy.sample.DemoSettings
-import me.gingerninja.lazy.sample.Destination
 import kotlin.math.absoluteValue
-
-internal fun NavGraphBuilder.calendarList(onBack: () -> Unit, modifier: Modifier = Modifier) {
-    composable(Destination.ListCalendar.route) {
-        CalendarListScreen(
-            onBack = onBack,
-            settings = DemoSettings(),
-            modifier = modifier,
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CalendarListScreen(
-    onBack: () -> Unit,
-    settings: DemoSettings,
-    modifier: Modifier = Modifier,
-) {
+fun CalendarListScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
                     Column {
-                        Text(Destination.ListCalendar.title)
+                        Text("Lazy Sticky Headers")
+                        Text(
+                            ListDestinations.Calendar.title,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                     }
                 },
                 navigationIcon = {
@@ -104,24 +97,10 @@ private fun CalendarListScreen(
                         )
                     }
                 },
-
-                /*actions = {
-                    IconButton(
-                        onClick = {
-                            showSettings()
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings"
-                        )
-                    }
-                }*/
             )
         },
     ) {
         CalendarList(
-            settings = settings,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
@@ -130,20 +109,16 @@ private fun CalendarListScreen(
 }
 
 @Composable
-private fun CalendarList(settings: DemoSettings, modifier: Modifier = Modifier) {
-    ScheduleView(
-        modifier = modifier,
-        isInfinite = settings.isInfinite,
-    )
-}
-
-@Composable
-private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
-    val startIndex = remember(isInfinite) {
-        if (isInfinite) Int.MAX_VALUE / 2 else 0
+private fun CalendarList(modifier: Modifier) {
+    val startIndex = remember {
+        Int.MAX_VALUE / 2
     }
 
     val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = startIndex,
+    )
+
+    val horizontalListState = rememberLazyListState(
         initialFirstVisibleItemIndex = startIndex,
     )
 
@@ -151,14 +126,128 @@ private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     }
 
-    val startDate = remember(isInfinite, today) {
-        if (isInfinite) {
-            today
-        } else {
-            today.minus(today.dayOfMonth - 1, DateTimeUnit.DAY)
+    val startDate = remember(today) {
+        today
+    }
+
+    LaunchedEffect(listState, horizontalListState) {
+        launch {
+            snapshotFlow { listState.firstVisibleItemIndex }
+                .collectLatest {
+                    horizontalListState.animateScrollToItem(
+                        scheduleIndexToMonthIndex(it, startIndex, startDate),
+                    )
+                }
         }
     }
 
+    Column(
+        modifier = modifier,
+    ) {
+        MonthView(
+            modifier = Modifier.padding(bottom = 12.dp),
+            listState = horizontalListState,
+            startIndex = startIndex,
+            startDate = startDate,
+        )
+
+        ScheduleView(
+            modifier = Modifier.weight(1f),
+            listState = listState,
+            startIndex = startIndex,
+            startDate = startDate,
+            today = today,
+        )
+    }
+}
+
+@Composable
+private fun MonthView(
+    listState: LazyListState,
+    startIndex: Int,
+    startDate: LocalDate,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
+        StickyHeaders(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState,
+            key = { item ->
+                val date = startDate.plus(item.index - startIndex, DateTimeUnit.DAY)
+
+                LocalDate(date.year, date.month, 1)
+            },
+        ) {
+            val formatter = LocalDate.Format {
+                monthName(MonthNames.ENGLISH_FULL)
+                chars(" ")
+                year()
+            }
+
+            Text(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp),
+                text = it.key.format(formatter),
+                style = MaterialTheme.typography.labelSmall,
+            )
+        }
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState,
+        ) {
+            monthViewDayItems(startIndex, startDate)
+        }
+    }
+}
+
+private fun LazyListScope.monthViewDayItems(startIndex: Int, startDate: LocalDate) {
+    items(
+        count = Int.MAX_VALUE,
+        key = { it },
+    ) {
+        val date = startDate.plus(it - startIndex, DateTimeUnit.DAY)
+
+        val formatter = LocalDate.Format {
+            dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
+        }
+
+        val dateHeader = formatter.format(date).let { day ->
+            day.firstOrNull()?.toString() ?: day
+        }
+
+        Column(
+            // modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .width(50.dp),
+            // .padding(horizontal = 10.dp, vertical = 10.dp)
+            // .fillParentMaxWidth(1 / 7f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                modifier = Modifier.padding(bottom = 10.dp),
+                text = dateHeader,
+                style = MaterialTheme.typography.labelSmall,
+            )
+
+            Text(
+                modifier = Modifier,
+                text = "${date.dayOfMonth}",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScheduleView(
+    listState: LazyListState,
+    startIndex: Int,
+    startDate: LocalDate,
+    today: LocalDate,
+    modifier: Modifier = Modifier,
+) {
     fun getDataByIndex(index: Int) = calculateDataByIndex(index, startIndex, startDate)
 
     fun getItemTypeByIndex(index: Int): ScheduleItemType {
@@ -171,14 +260,13 @@ private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
             state = listState,
         ) {
             items(
-                count = if (isInfinite) Int.MAX_VALUE else FINITE_ITEM_COUNT,
+                count = Int.MAX_VALUE,
                 key = { it },
                 contentType = ::getItemTypeByIndex,
             ) {
                 val data = getDataByIndex(it)
 
                 when (data.type) {
-                    ScheduleItemType.MONTH -> TODO()
                     ScheduleItemType.WEEK -> {
                         ScheduleWeek(
                             startDate = data.date,
@@ -207,7 +295,7 @@ private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
                 .padding(start = 20.dp)
                 .fillMaxHeight(),
             state = listState,
-            stickyKeyFactory = { item ->
+            key = { item ->
                 val itemKey = getDataByIndex(item.index)
                 val itemType = item.contentType as ScheduleItemType
 
@@ -232,9 +320,9 @@ private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
                     dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
                 }
                 Text(
-                    text = it.format(formatter),
+                    text = it.key.format(formatter),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (today == it) {
+                    color = if (today == it.key) {
                         MaterialTheme.colorScheme.secondary
                     } else {
                         Color.Unspecified
@@ -244,7 +332,7 @@ private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
                     modifier = Modifier
                         .aspectRatio(1f)
                         .run {
-                            if (today == it) {
+                            if (today == it.key) {
                                 background(
                                     color = MaterialTheme.colorScheme.secondary,
                                     shape = CircleShape,
@@ -258,8 +346,8 @@ private fun ScheduleView(modifier: Modifier, isInfinite: Boolean) {
                     Text(
                         modifier = Modifier.padding(bottom = 2.dp),
                         textAlign = TextAlign.Center,
-                        text = "${it.dayOfMonth}",
-                        color = if (today == it) {
+                        text = "${it.key.dayOfMonth}",
+                        color = if (today == it.key) {
                             MaterialTheme.colorScheme.onSecondary
                         } else {
                             MaterialTheme.colorScheme.onSurface
@@ -324,10 +412,11 @@ private fun ScheduleItem(title: String, subtitle: String, modifier: Modifier = M
     }
 }
 
-private class CalculatedDate(
-    val date: LocalDate,
-    val type: ScheduleItemType,
-)
+private fun scheduleIndexToMonthIndex(index: Int, startIndex: Int, startDate: LocalDate): Int {
+    val original = calculateDataByIndex(index, startIndex, startDate)
+
+    return startIndex + startDate.daysUntil(original.date)
+}
 
 private fun calculateDataByIndex(
     index: Int,
@@ -409,8 +498,12 @@ private object DateFormatters {
     }
 }
 
+private class CalculatedDate(
+    val date: LocalDate,
+    val type: ScheduleItemType,
+)
+
 private enum class ScheduleItemType {
-    MONTH,
     WEEK,
     ITEM,
 }

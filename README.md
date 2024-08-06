@@ -11,7 +11,14 @@
 
 # Lazy Sticky Headers
 
-Kotlin Multiplatform library for adding sticky items to lazy lists.
+Compose Multiplatform library for adding sticky headers to lazy lists.
+
+## Preview
+
+<p align="center">
+<img src="asset/preview_contacts.gif" width="270">
+<img src="asset/preview_calendar.gif" width="270">
+</p>
 
 ## Getting started
 

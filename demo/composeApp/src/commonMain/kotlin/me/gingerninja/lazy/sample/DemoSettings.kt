@@ -18,10 +18,12 @@ package me.gingerninja.lazy.sample
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.ui.unit.LayoutDirection
 
 @Immutable
 data class DemoSettings(
     val theme: Theme = Theme.AUTO,
+    val layoutDirection: LayoutDirection? = null,
     val isVertical: Boolean = true,
     val isInfinite: Boolean = true,
 ) {
@@ -31,20 +33,27 @@ data class DemoSettings(
          */
         val Saver = run {
             val themeKey = "theme"
+            val layoutDirKey = "layoutDir"
             val isVerticalKey = "isVertical"
             val isInfiniteKey = "isInfinite"
 
             mapSaver(
                 save = {
                     mapOf(
-                        themeKey to it.theme.text,
+                        themeKey to it.theme.ordinal,
+                        layoutDirKey to it.layoutDirection?.ordinal,
                         isVerticalKey to it.isVertical,
                         isInfiniteKey to it.isInfinite,
                     )
                 },
                 restore = {
                     DemoSettings(
-                        theme = it[themeKey] as Theme,
+                        theme = (it[themeKey] as Int).let { ordinal ->
+                            Theme.entries[ordinal]
+                        },
+                        layoutDirection = (it[layoutDirKey] as? Int)?.let { ordinal ->
+                            LayoutDirection.entries[ordinal]
+                        },
                         isVertical = it[isVerticalKey] as Boolean,
                         isInfinite = it[isInfiniteKey] as Boolean,
                     )

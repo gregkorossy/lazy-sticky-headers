@@ -32,9 +32,11 @@ fun NavCard(
     description: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Card(
         onClick = onClick,
+        enabled = enabled,
         colors = CardDefaults.outlinedCardColors(),
         border = CardDefaults.outlinedCardBorder(),
         modifier = modifier,

@@ -33,10 +33,22 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 
+/**
+ * The sticky item interval container. This represents a single sticky item.
+ */
 @Immutable
-private data class StickyInterval<T : Any>(
+data class StickyInterval<T : Any>(
+    /**
+     * Key of the interval that was returned by `key` in [StickyHeaders].
+     */
     val key: T,
+    /**
+     * Start index of the interval (inclusive).
+     */
     val startIndex: Int,
+    /**
+     * End index of the interval (exclusive).
+     */
     val endIndex: Int,
 )
 
@@ -49,27 +61,29 @@ private data class StickyInterval<T : Any>(
  * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or a
  * [LazyRow][androidx.compose.foundation.lazy.LazyRow] with [state].
  *
- * The items are grouped by the value returned by [stickyKeyFactory]. This grouping only occurs in
+ * The items are grouped by the value returned by [key]. This grouping only occurs in
  * a consecutive order, meaning that if the function returns the same value for two non-consecutive
  * items, two sticky headers will be created, thus this is generally discouraged.
- * When the [stickyKeyFactory] returns `null`, it acts as a boundary for the sticky items before /
+ * When the [key] returns `null`, it acts as a boundary for the sticky items before /
  * after.
  *
  * @param state the [LazyListState] of the list
- * @param stickyKeyFactory key factory function for the sticky items
+ * @param key key factory function for the sticky items
  * @param modifier [Modifier] applied to the container of the sticky items
  * @param content sticky item content
  */
 @Composable
 fun <T : Any> StickyHeaders(
     state: LazyListState,
-    stickyKeyFactory: (item: LazyListItemInfo) -> T?,
+    key: (item: LazyListItemInfo) -> T?,
+    // contentType: (item: LazyListItemInfo) -> Any? = { null },
     modifier: Modifier = Modifier,
-    content: @Composable (stickyKey: T) -> Unit,
+    // TODO use the StickyInterval<T> instead of T?
+    content: @Composable (stickyKey: StickyInterval<T>) -> Unit,
 ) {
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
 
-    val keyFactory = rememberUpdatedState(stickyKeyFactory)
+    val keyFactory = rememberUpdatedState(key)
 
     val orientation by remember(state) {
         derivedStateOf {
@@ -94,21 +108,21 @@ fun <T : Any> StickyHeaders(
 
                     buildList {
                         items.forEach { item ->
-                            val key = keyFactory.value(item)
+                            val currentKey = keyFactory.value(item)
 
                             if (!initKeySet) {
                                 initKeySet = true
-                                lastKey = key
+                                lastKey = currentKey
                             }
 
-                            if (lastKey != key) {
+                            if (lastKey != currentKey) {
                                 lastKey?.also {
                                     add(
                                         StickyInterval(it, lastIndex, item.index),
                                     )
                                 }
 
-                                lastKey = key
+                                lastKey = currentKey
                                 lastIndex = item.index
                             }
                         }
@@ -126,8 +140,8 @@ fun <T : Any> StickyHeaders(
     Box(
         modifier = modifier.clipToBounds(),
     ) {
-        keys.forEach { (key, start, end) ->
-            key(key) { // TODO ReusableContentHost { }, see LazyLayoutItemContentFactory
+        keys.forEach { interval ->
+            key(interval.key) { // TODO ReusableContentHost { }, see LazyLayoutItemContentFactory
                 Box(
                     modifier = Modifier
                         .run {
@@ -140,10 +154,11 @@ fun <T : Any> StickyHeaders(
                             }
                         }
                         .graphicsLayer {
-                            val next =
-                                state.layoutInfo.visibleItemsInfo.firstOrNull { it.index == end }
-                            val item =
-                                state.layoutInfo.visibleItemsInfo.firstOrNull { it.index == start }
+                            val next = state.layoutInfo.visibleItemsInfo
+                                .firstOrNull { it.index == interval.endIndex }
+
+                            val item = state.layoutInfo.visibleItemsInfo
+                                .firstOrNull { it.index == interval.startIndex }
 
                             val nextOffset = next?.offset ?: Int.MAX_VALUE
 
@@ -173,7 +188,7 @@ fun <T : Any> StickyHeaders(
                             }
                         },
                 ) {
-                    content(key)
+                    content(interval)
                 }
             }
         }

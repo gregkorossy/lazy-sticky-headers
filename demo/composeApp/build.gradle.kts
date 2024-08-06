@@ -106,6 +106,10 @@ android {
         getByName("release") {
             isMinifyEnabled = false
         }
+        create("composeRelease") {
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
