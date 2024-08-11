@@ -1,3 +1,45 @@
+public final class me/gingerninja/lazy/GridStickyHeadersKt {
+	public static final fun StickyHeaders (Landroidx/compose/foundation/lazy/grid/LazyGridState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class me/gingerninja/lazy/LazyGridItem {
+	public static final synthetic fun box-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Lme/gingerninja/lazy/LazyGridItem;
+	public static fun constructor-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Z
+	public static final fun getColumn-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)I
+	public static final fun getContentType-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Ljava/lang/Object;
+	public static final fun getIndex-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)I
+	public static final fun getKey-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Ljava/lang/Object;
+	public static final fun getOffset-nOcc-ac (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)J
+	public static final fun getRow-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)I
+	public static final fun getSize-YbymL2g (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)J
+	public fun hashCode ()I
+	public static fun hashCode-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;
+}
+
+public final class me/gingerninja/lazy/LazyListItem {
+	public static final synthetic fun box-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Lme/gingerninja/lazy/LazyListItem;
+	public static fun constructor-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Landroidx/compose/foundation/lazy/LazyListItemInfo;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Landroidx/compose/foundation/lazy/LazyListItemInfo;Landroidx/compose/foundation/lazy/LazyListItemInfo;)Z
+	public static final fun getContentType-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Ljava/lang/Object;
+	public static final fun getIndex-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)I
+	public static final fun getKey-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Ljava/lang/Object;
+	public static final fun getOffset-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)I
+	public static final fun getSize-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)I
+	public fun hashCode ()I
+	public static fun hashCode-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Landroidx/compose/foundation/lazy/LazyListItemInfo;
+}
+
 public final class me/gingerninja/lazy/StickyHeadersKt {
 	public static final fun StickyHeaders (Landroidx/compose/foundation/lazy/LazyListState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }

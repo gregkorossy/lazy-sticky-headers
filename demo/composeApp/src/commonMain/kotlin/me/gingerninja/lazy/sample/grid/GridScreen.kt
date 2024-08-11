@@ -39,6 +39,13 @@ fun NavGraphBuilder.gridScreens(
                 modifier = modifier,
             )
         }
+
+        composable(GridDestinations.SimpleVerticalGrid.route) {
+            SimpleVerticalGridScreen(
+                modifier = modifier,
+                onBack = onBack,
+            )
+        }
     }
 }
 
@@ -46,13 +53,19 @@ object GridDestinations {
     val root = Destination(
         route = "grid",
         title = "Grids",
-        description = "Coming soon...",
-        // description = "LazyVerticalGrid and LazyHorizontalGrid examples",
-        enabled = false,
+        description = "LazyVerticalGrid and LazyHorizontalGrid examples",
+    )
+
+    internal val SimpleVerticalGrid = Destination(
+        route = "grid/simple-vertical",
+        title = "Simple LazyVerticalGrid",
+        description = "A vertical grid",
     )
 }
 
-private val destinations = listOf<Destination>()
+private val destinations = listOf(
+    GridDestinations.SimpleVerticalGrid,
+)
 
 @Composable
 private fun GridScreen(

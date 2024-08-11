@@ -17,10 +17,11 @@ package me.gingerninja.lazy
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.LazyListItemInfo
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
+import androidx.compose.foundation.lazy.grid.LazyGridItemInfo.Companion.UnknownColumn
+import androidx.compose.foundation.lazy.grid.LazyGridItemInfo.Companion.UnknownRow
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -31,37 +32,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import kotlin.jvm.JvmInline
 
 /**
- * The sticky item interval container. This represents a single sticky item.
- */
-@Immutable
-data class StickyInterval<T : Any>(
-    /**
-     * Key of the interval that was returned by `key` in [StickyHeaders].
-     */
-    val key: T,
-    /**
-     * Start index of the interval (inclusive).
-     */
-    val startIndex: Int,
-    /**
-     * End index of the interval (exclusive).
-     */
-    val endIndex: Int,
-)
-
-/**
- * Contains useful information about an individual item in lazy lists like
- * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or
- * [LazyRow][androidx.compose.foundation.lazy.LazyRow].
+ * Contains useful information about an individual item in lazy grids like
+ * [LazyVerticalGrid][androidx.compose.foundation.lazy.grid.LazyVerticalGrid] or
+ * [LazyHorizontalGrid][androidx.compose.foundation.lazy.grid.LazyHorizontalGrid].
  */
 @JvmInline
-value class LazyListItem(private val value: LazyListItemInfo) {
+value class LazyGridItem(private val value: LazyGridItemInfo) {
     /**
-     * The index of the item in the list.
+     * The index of the item in the grid.
      */
     val index: Int get() = value.index
 
@@ -76,25 +60,35 @@ value class LazyListItem(private val value: LazyListItemInfo) {
     val contentType: Any? get() = value.contentType
 
     /**
-     * The main axis offset of the item in pixels. It is relative to the start of the lazy list container.
+     * The main axis offset of the item in pixels. It is relative to the start of the lazy grid container.
      */
-    val offset: Int get() = value.offset
+    val offset: IntOffset get() = value.offset
 
     /**
      * The main axis size of the item in pixels. Note that if you emit multiple layouts in the composable
-     * slot for the item then this size will be calculated as the sum of their sizes.
+     * slot for the item then this size will be calculated as the max of their sizes.
      */
-    val size: Int get() = value.size
-}
+    val size: IntSize get() = value.size
 
-/* TODO
-    - scroll on the box? overscroll effect?
- */
+    /**
+     * The row occupied by the top start point of the item.
+     * If this is unknown, for example while this item is animating to exit the viewport and is
+     * still visible, the value will be [UnknownRow].
+     */
+    val row: Int get() = value.row
+
+    /**
+     * The column occupied by the top start point of the item.
+     * If this is unknown, for example while this item is animating to exit the viewport and is
+     * still visible, the value will be [UnknownColumn].
+     */
+    val column: Int get() = value.column
+}
 
 /**
  * Creates and tracks sticky items belonging to a
- * [LazyColumn][androidx.compose.foundation.lazy.LazyColumn] or a
- * [LazyRow][androidx.compose.foundation.lazy.LazyRow] with [state].
+ * [LazyVerticalGrid][androidx.compose.foundation.lazy.grid.LazyVerticalGrid] or a
+ * [LazyHorizontalGrid][androidx.compose.foundation.lazy.grid.LazyHorizontalGrid] with [state].
  *
  * The items are grouped by the value returned by [key]. This grouping only occurs in
  * a consecutive order, meaning that if the function returns the same value for two non-consecutive
@@ -102,15 +96,15 @@ value class LazyListItem(private val value: LazyListItemInfo) {
  * When the [key] returns `null`, it acts as a boundary for the sticky items before /
  * after.
  *
- * @param state the [LazyListState] of the list
+ * @param state the [LazyGridState] of the grid
  * @param key key factory function for the sticky items
  * @param modifier [Modifier] applied to the container of the sticky items
  * @param content sticky item content
  */
 @Composable
 fun <T : Any> StickyHeaders(
-    state: LazyListState,
-    key: (item: LazyListItem) -> T?,
+    state: LazyGridState,
+    key: (item: List<LazyGridItem>) -> T?,
     // contentType: (item: LazyListItem) -> Any? = { null },
     modifier: Modifier = Modifier,
     content: @Composable (stickyKey: StickyInterval<T>) -> Unit,
@@ -131,6 +125,14 @@ fun <T : Any> StickyHeaders(
         }
     }
 
+    fun IntOffset.dirOffset(): Int {
+        return if (orientation == Orientation.Vertical) {
+            y
+        } else {
+            x
+        }
+    }
+
     val keys: List<StickyInterval<T>> by remember(state) {
         derivedStateOf {
             state.layoutInfo.visibleItemsInfo
@@ -140,9 +142,31 @@ fun <T : Any> StickyHeaders(
                     var lastKey: T? = null
                     var lastIndex = items.first().index
 
+                    var listIndex = 0
+                    var lastLane = -2
+
                     buildList {
-                        items.forEach { item ->
-                            val currentKey = keyFactory.value(LazyListItem(item))
+                        for ((index, item) in items.withIndex()) {
+                            val lane =
+                                if (orientation == Orientation.Vertical) item.row else item.column
+
+                            if (lane == UnknownRow || lane == UnknownColumn) {
+                                continue
+                            }
+
+                            if (lastLane == -2) {
+                                lastLane = lane
+                            }
+
+                            if (lastLane == lane) {
+                                continue
+                            }
+
+                            val sameLaneItems = items.subList(listIndex, index).map(::LazyGridItem)
+                            listIndex = index
+                            lastLane = lane
+
+                            val currentKey = keyFactory.value(sameLaneItems)
 
                             if (!initKeySet) {
                                 initKeySet = true
@@ -150,15 +174,32 @@ fun <T : Any> StickyHeaders(
                             }
 
                             if (lastKey != currentKey) {
+                                val endIndex = sameLaneItems.first().index
                                 lastKey?.also {
                                     add(
-                                        StickyInterval(it, lastIndex, item.index),
+                                        StickyInterval(it, lastIndex, endIndex),
                                     )
                                 }
 
                                 lastKey = currentKey
-                                lastIndex = item.index
+                                lastIndex = endIndex
                             }
+                        }
+
+                        val sameLaneItems = items.subList(listIndex, items.size).map(::LazyGridItem)
+                        val sameLaneKey = keyFactory.value(sameLaneItems)
+
+                        if (!initKeySet) { // all items belong to the same lane
+                            lastKey = sameLaneKey
+                        } else if (lastKey != sameLaneKey) {
+                            lastKey?.also {
+                                add(
+                                    StickyInterval(it, lastIndex, items[listIndex].index),
+                                )
+                            }
+
+                            lastKey = sameLaneKey
+                            lastIndex = items[listIndex].index
                         }
 
                         lastKey?.also {
@@ -188,13 +229,15 @@ fun <T : Any> StickyHeaders(
                             }
                         }
                         .graphicsLayer {
+                            val spacing = state.layoutInfo.mainAxisItemSpacing
+
                             val next = state.layoutInfo.visibleItemsInfo
                                 .firstOrNull { it.index == interval.endIndex }
 
                             val item = state.layoutInfo.visibleItemsInfo
                                 .firstOrNull { it.index == interval.startIndex }
 
-                            val nextOffset = next?.offset ?: Int.MAX_VALUE
+                            val nextOffset = next?.offset?.dirOffset() ?: Int.MAX_VALUE
 
                             val beforePadding = state.layoutInfo.beforeContentPadding
 
@@ -207,15 +250,17 @@ fun <T : Any> StickyHeaders(
                                 alpha = 0f
                             } else {
                                 if (orientation == Orientation.Vertical) {
-                                    val y = (nextOffset - size.height + beforePadding)
+                                    val y = (nextOffset - spacing - size.height + beforePadding)
                                         .coerceAtMost(0f)
-                                    val offset = (item.offset + beforePadding).coerceAtLeast(0)
+                                    val offset =
+                                        (item.offset.dirOffset() + beforePadding).coerceAtLeast(0)
 
                                     translationY = (offset + y) * direction
                                 } else {
-                                    val x = (nextOffset - size.width + beforePadding)
+                                    val x = (nextOffset - spacing - size.width + beforePadding)
                                         .coerceAtMost(0f)
-                                    val offset = (item.offset + beforePadding).coerceAtLeast(0)
+                                    val offset =
+                                        (item.offset.dirOffset() + beforePadding).coerceAtLeast(0)
 
                                     translationX = (offset + x) * direction
                                 }
