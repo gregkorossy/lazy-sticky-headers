@@ -2,6 +2,14 @@ public final class me/gingerninja/lazy/GridStickyHeadersKt {
 	public static final fun StickyHeaders (Landroidx/compose/foundation/lazy/grid/LazyGridState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
+public final class me/gingerninja/lazy/LazyGridInfoProvider : me/gingerninja/lazy/StickyLayoutInfoProvider {
+	public static final field $stable I
+	public fun <init> (Landroidx/compose/foundation/lazy/grid/LazyGridState;)V
+	public fun getBeforeContentPadding ()I
+	public fun getMainAxisItemSpacing ()I
+	public fun itemOffsetAt (ILandroidx/compose/foundation/gestures/Orientation;)Ljava/lang/Integer;
+}
+
 public final class me/gingerninja/lazy/LazyGridItem {
 	public static final synthetic fun box-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Lme/gingerninja/lazy/LazyGridItem;
 	public static fun constructor-impl (Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;)Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;
@@ -22,6 +30,14 @@ public final class me/gingerninja/lazy/LazyGridItem {
 	public final synthetic fun unbox-impl ()Landroidx/compose/foundation/lazy/grid/LazyGridItemInfo;
 }
 
+public final class me/gingerninja/lazy/LazyListInfoProvider : me/gingerninja/lazy/StickyLayoutInfoProvider {
+	public static final field $stable I
+	public fun <init> (Landroidx/compose/foundation/lazy/LazyListState;)V
+	public fun getBeforeContentPadding ()I
+	public fun getMainAxisItemSpacing ()I
+	public fun itemOffsetAt (ILandroidx/compose/foundation/gestures/Orientation;)Ljava/lang/Integer;
+}
+
 public final class me/gingerninja/lazy/LazyListItem {
 	public static final synthetic fun box-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Lme/gingerninja/lazy/LazyListItem;
 	public static fun constructor-impl (Landroidx/compose/foundation/lazy/LazyListItemInfo;)Landroidx/compose/foundation/lazy/LazyListItemInfo;
@@ -40,8 +56,12 @@ public final class me/gingerninja/lazy/LazyListItem {
 	public final synthetic fun unbox-impl ()Landroidx/compose/foundation/lazy/LazyListItemInfo;
 }
 
-public final class me/gingerninja/lazy/StickyHeadersKt {
+public final class me/gingerninja/lazy/ListStickyHeadersKt {
 	public static final fun StickyHeaders (Landroidx/compose/foundation/lazy/LazyListState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+}
+
+public final class me/gingerninja/lazy/StickyHeadersLayoutKt {
+	public static final fun StickyHeadersLayout (Ljava/util/List;Landroidx/compose/foundation/gestures/Orientation;ZLme/gingerninja/lazy/StickyLayoutInfoProvider;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class me/gingerninja/lazy/StickyInterval {
@@ -58,5 +78,11 @@ public final class me/gingerninja/lazy/StickyInterval {
 	public final fun getStartIndex ()I
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class me/gingerninja/lazy/StickyLayoutInfoProvider {
+	public abstract fun getBeforeContentPadding ()I
+	public abstract fun getMainAxisItemSpacing ()I
+	public abstract fun itemOffsetAt (ILandroidx/compose/foundation/gestures/Orientation;)Ljava/lang/Integer;
 }
 

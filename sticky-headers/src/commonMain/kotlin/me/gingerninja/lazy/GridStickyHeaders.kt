@@ -16,7 +16,6 @@
 package me.gingerninja.lazy
 
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
 import androidx.compose.foundation.lazy.grid.LazyGridItemInfo.Companion.UnknownColumn
 import androidx.compose.foundation.lazy.grid.LazyGridItemInfo.Companion.UnknownRow
@@ -24,17 +23,11 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import kotlin.jvm.JvmInline
 
 /**
@@ -107,10 +100,8 @@ fun <T : Any> StickyHeaders(
     key: (item: List<LazyGridItem>) -> T?,
     // contentType: (item: LazyListItem) -> Any? = { null },
     modifier: Modifier = Modifier,
-    content: @Composable (stickyKey: StickyInterval<T>) -> Unit,
+    content: @Composable (stickyInterval: StickyInterval<T>) -> Unit,
 ) {
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-
     val keyFactory = rememberUpdatedState(key)
 
     val orientation by remember(state) {
@@ -122,14 +113,6 @@ fun <T : Any> StickyHeaders(
     val reverseLayout by remember(state) {
         derivedStateOf {
             state.layoutInfo.reverseLayout
-        }
-    }
-
-    fun IntOffset.dirOffset(): Int {
-        return if (orientation == Orientation.Vertical) {
-            y
-        } else {
-            x
         }
     }
 
@@ -212,64 +195,36 @@ fun <T : Any> StickyHeaders(
         }
     }
 
-    Box(
-        modifier = modifier.clipToBounds(),
-    ) {
-        keys.forEach { interval ->
-            key(interval.key) { // TODO ReusableContentHost { }, see LazyLayoutItemContentFactory
-                Box(
-                    modifier = Modifier
-                        .run {
-                            if (orientation == Orientation.Horizontal && reverseLayout) {
-                                align(Alignment.CenterEnd)
-                            } else if (orientation == Orientation.Vertical && reverseLayout) {
-                                align(Alignment.BottomCenter)
-                            } else {
-                                this
-                            }
-                        }
-                        .graphicsLayer {
-                            val spacing = state.layoutInfo.mainAxisItemSpacing
+    StickyHeadersLayout(
+        keys = keys,
+        orientation = orientation,
+        reverseLayout = reverseLayout,
+        layoutInfoProvider = remember(state) { LazyGridInfoProvider(state) },
+        modifier = modifier,
+        content = content,
+    )
+}
 
-                            val next = state.layoutInfo.visibleItemsInfo
-                                .firstOrNull { it.index == interval.endIndex }
+/**
+ * Provides basic info about the grid that will be used by [StickyHeadersLayout].
+ */
+class LazyGridInfoProvider(private val listState: LazyGridState) : StickyLayoutInfoProvider {
+    override val mainAxisItemSpacing: Int
+        get() = listState.layoutInfo.mainAxisItemSpacing
 
-                            val item = state.layoutInfo.visibleItemsInfo
-                                .firstOrNull { it.index == interval.startIndex }
+    override val beforeContentPadding: Int
+        get() = listState.layoutInfo.beforeContentPadding
 
-                            val nextOffset = next?.offset?.dirOffset() ?: Int.MAX_VALUE
-
-                            val beforePadding = state.layoutInfo.beforeContentPadding
-
-                            val switchDirection =
-                                reverseLayout.xor(isRtl && orientation == Orientation.Horizontal)
-
-                            val direction = if (switchDirection) -1f else 1f
-
-                            if (item == null) { // don't show the item if it's not visible anymore
-                                alpha = 0f
-                            } else {
-                                if (orientation == Orientation.Vertical) {
-                                    val y = (nextOffset - spacing - size.height + beforePadding)
-                                        .coerceAtMost(0f)
-                                    val offset =
-                                        (item.offset.dirOffset() + beforePadding).coerceAtLeast(0)
-
-                                    translationY = (offset + y) * direction
-                                } else {
-                                    val x = (nextOffset - spacing - size.width + beforePadding)
-                                        .coerceAtMost(0f)
-                                    val offset =
-                                        (item.offset.dirOffset() + beforePadding).coerceAtLeast(0)
-
-                                    translationX = (offset + x) * direction
-                                }
-                            }
-                        },
-                ) {
-                    content(interval)
+    override fun itemOffsetAt(index: Int, orientation: Orientation): Int? {
+        return listState.layoutInfo.visibleItemsInfo
+            .firstOrNull { it.index == index }
+            ?.offset
+            ?.run {
+                if (orientation == Orientation.Vertical) {
+                    y
+                } else {
+                    x
                 }
             }
-        }
     }
 }

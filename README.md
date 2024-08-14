@@ -11,21 +11,22 @@
 ![badge-js](http://img.shields.io/badge/platform-JS-F8DB5D.svg?style=flat)
 ![badge-wasm](http://img.shields.io/badge/platform-Wasm-624FE8.svg?style=flat)
 
-# Lazy Sticky Headers
+# Advanced Sticky Headers
 
-Compose Multiplatform library for adding sticky headers to lazy lists.
+Compose Multiplatform library for adding advanced sticky headers to lazy lists and grids.
 
 ## Preview
 
 <p align="center">
 <img src="asset/preview_contacts.gif" width="270">
 <img src="asset/preview_calendar.gif" width="270">
+<img src="asset/preview_grid.gif" width="270">
 </p>
 
 ## Getting started
 
 ```kotlin
-implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
+implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
 ```
 
 <details>
@@ -38,7 +39,7 @@ If you target a subset of the library supported platforms, add the library to yo
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
+            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
             // ...
         }
     }
@@ -53,12 +54,12 @@ add the library separately to each supported target:
 kotlin {
     val desktopMain by getting {
         dependencies {
-            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
+            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
             // ...
         }
     }
     androidMain.dependencies {
-        implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha02")
+        implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
         // ...
     }
     // other targets...
