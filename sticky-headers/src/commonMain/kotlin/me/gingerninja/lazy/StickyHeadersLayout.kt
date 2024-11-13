@@ -24,7 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 
 /**
  * Provides basic info about the layout that will be used by [StickyHeadersLayout] when placing the
@@ -67,6 +69,7 @@ interface StickyLayoutInfoProvider {
  * laid out in the reverse order.
  * @param layoutInfoProvider basic info provider about the visible items and their container
  * @param modifier [Modifier] applied to the container of the sticky items
+ * @param stickyEdgePadding the padding applied to the sticky items on the edge where they stick to
  * @param content sticky item content
  */
 @Composable
@@ -76,6 +79,7 @@ fun <T : Any> StickyHeadersLayout(
     reverseLayout: Boolean,
     layoutInfoProvider: StickyLayoutInfoProvider,
     modifier: Modifier = Modifier,
+    stickyEdgePadding: Dp = 0.dp,
     content: @Composable (stickyInterval: StickyInterval<T>) -> Unit,
 ) {
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -112,24 +116,30 @@ fun <T : Any> StickyHeadersLayout(
 
                             val direction = if (switchDirection) -1f else 1f
 
+                            val stickyPadding = stickyEdgePadding.roundToPx()
+
                             if (itemOffset == null) {
                                 // don't show the item if it's not visible anymore
                                 alpha = 0f
                             } else {
+                                val diff = nextOffset - spacing + beforePadding - stickyPadding
+
                                 if (orientation == Orientation.Vertical) {
-                                    val y = (nextOffset - spacing - size.height + beforePadding)
-                                        .coerceAtMost(0f)
+                                    val y = (diff - size.height).coerceAtMost(0f)
                                     val offset =
                                         (itemOffset + beforePadding).coerceAtLeast(0)
 
-                                    translationY = (offset + y) * direction
+                                    val inset = (stickyPadding - offset).coerceAtLeast(0)
+
+                                    translationY = (offset + y + inset) * direction
                                 } else {
-                                    val x = (nextOffset - spacing - size.width + beforePadding)
-                                        .coerceAtMost(0f)
+                                    val x = (diff - size.width).coerceAtMost(0f)
                                     val offset =
                                         (itemOffset + beforePadding).coerceAtLeast(0)
 
-                                    translationX = (offset + x) * direction
+                                    val inset = (stickyPadding - offset).coerceAtLeast(0)
+
+                                    translationX = (offset + x + inset) * direction
                                 }
                             }
                         },
