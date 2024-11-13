@@ -1,5 +1,5 @@
 public final class me/gingerninja/lazy/GridStickyHeadersKt {
-	public static final fun StickyHeaders (Landroidx/compose/foundation/lazy/grid/LazyGridState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun StickyHeaders-hGBTI10 (Landroidx/compose/foundation/lazy/grid/LazyGridState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;FLkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class me/gingerninja/lazy/LazyGridInfoProvider : me/gingerninja/lazy/StickyLayoutInfoProvider {
@@ -57,11 +57,11 @@ public final class me/gingerninja/lazy/LazyListItem {
 }
 
 public final class me/gingerninja/lazy/ListStickyHeadersKt {
-	public static final fun StickyHeaders (Landroidx/compose/foundation/lazy/LazyListState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun StickyHeaders-hGBTI10 (Landroidx/compose/foundation/lazy/LazyListState;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;FLkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class me/gingerninja/lazy/StickyHeadersLayoutKt {
-	public static final fun StickyHeadersLayout (Ljava/util/List;Landroidx/compose/foundation/gestures/Orientation;ZLme/gingerninja/lazy/StickyLayoutInfoProvider;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun StickyHeadersLayout-PfoAEA0 (Ljava/util/List;Landroidx/compose/foundation/gestures/Orientation;ZLme/gingerninja/lazy/StickyLayoutInfoProvider;Landroidx/compose/ui/Modifier;FLkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
 }
 
 public final class me/gingerninja/lazy/StickyInterval {

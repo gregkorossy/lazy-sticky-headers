@@ -25,6 +25,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.jvm.JvmInline
 
 /**
@@ -94,6 +96,7 @@ value class LazyListItem(private val value: LazyListItemInfo) {
  * @param state the [LazyListState] of the list
  * @param key key factory function for the sticky items
  * @param modifier [Modifier] applied to the container of the sticky items
+ * @param stickyEdgePadding the padding applied to the sticky items on the edge where they stick to
  * @param content sticky item content
  */
 @Composable
@@ -102,6 +105,7 @@ fun <T : Any> StickyHeaders(
     key: (item: LazyListItem) -> T?,
     // contentType: (item: LazyListItem) -> Any? = { null },
     modifier: Modifier = Modifier,
+    stickyEdgePadding: Dp = 0.dp,
     content: @Composable (stickyInterval: StickyInterval<T>) -> Unit,
 ) {
     val keyFactory = rememberUpdatedState(key)
@@ -164,6 +168,7 @@ fun <T : Any> StickyHeaders(
         reverseLayout = reverseLayout,
         layoutInfoProvider = remember(state) { LazyListInfoProvider(state) },
         modifier = modifier,
+        stickyEdgePadding = stickyEdgePadding,
         content = content,
     )
 }
