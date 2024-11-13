@@ -1,7 +1,7 @@
 ![Lazy Sticky Headers](asset/header.png)
 
-[![Kotlin 2.0.0](https://img.shields.io/badge/Kotlin-2.0.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
-[![Compose Multiplatform 1.6.11](https://img.shields.io/badge/Compose_Multiplatform-1.6.11-blue.svg?logo=jetpackcompose)](https://github.com/JetBrains/compose-multiplatform)
+[![Kotlin 2.0.21](https://img.shields.io/badge/Kotlin-2.0.21-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Compose Multiplatform 1.7.1](https://img.shields.io/badge/Compose_Multiplatform-1.7.1-blue.svg?logo=jetpackcompose)](https://github.com/JetBrains/compose-multiplatform)
 [![Maven Central](https://img.shields.io/maven-central/v/me.gingerninja.lazy/sticky-headers?color=orange)](https://search.maven.org/search?q=g:me.gingerninja.lazy)
 [![Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -26,7 +26,7 @@ Compose Multiplatform library for adding advanced sticky headers to lazy lists a
 ## Getting started
 
 ```kotlin
-implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
+implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha04")
 ```
 
 <details>
@@ -39,7 +39,7 @@ If you target a subset of the library supported platforms, add the library to yo
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
+            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha04")
             // ...
         }
     }
@@ -54,12 +54,12 @@ add the library separately to each supported target:
 kotlin {
     val desktopMain by getting {
         dependencies {
-            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
+            implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha04")
             // ...
         }
     }
     androidMain.dependencies {
-        implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha03")
+        implementation("me.gingerninja.lazy:sticky-headers:0.1.0-alpha04")
         // ...
     }
     // other targets...
